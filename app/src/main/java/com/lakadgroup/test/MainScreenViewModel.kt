@@ -7,9 +7,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
+
+enum class MainScreenState {
+    Initial,
+    Generated,
+    WarmingUp,
+    Processing,
+    Generating,
+}
+
 class MainScreenViewModel : ViewModel() {
 
-    var isLoading = MutableStateFlow(false)
+    var mainScreenState = MutableStateFlow(MainScreenState.Initial)
     var rngOutput = MutableStateFlow<Int?>(null)
 
     var minOutput = MutableStateFlow(0)
@@ -17,11 +26,15 @@ class MainScreenViewModel : ViewModel() {
 
     fun onGenerateButtonClick() {
         viewModelScope.launch {
-            isLoading.value = true
+            mainScreenState.value = MainScreenState.WarmingUp
             delay(1000)
-            rngOutput.value = Random.nextInt(minOutput.value, maxOutput.value)
-            isLoading.value = false
+            mainScreenState.value = MainScreenState.Processing
+            delay(1000)
+            mainScreenState.value = MainScreenState.Generating
+            delay(1000)
 
+            rngOutput.value = Random.nextInt(minOutput.value, maxOutput.value)
+            mainScreenState.value = MainScreenState.Generated
         } // launch
     } // function
 

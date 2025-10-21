@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -24,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +50,7 @@ fun MainScreen() {
         ) {
             val mainScreenViewModel : MainScreenViewModel = viewModel()
 
-            val isLoading by mainScreenViewModel.isLoading.collectAsState()
+            val mainScreenState by mainScreenViewModel.mainScreenState.collectAsState()
             val rngOutput by mainScreenViewModel.rngOutput.collectAsState()
             val minOutput by mainScreenViewModel.minOutput.collectAsState()
             val maxOutput by mainScreenViewModel.maxOutput.collectAsState()
@@ -63,37 +63,65 @@ fun MainScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-                if(isLoading) {
-                    CircularProgressIndicator()
-                    Text("Generating your best number...")
-                } else {
-                    Button(
-                        onClick = {
-                            mainScreenViewModel.onGenerateButtonClick()
-                        },
-                        modifier = Modifier.size(128.dp),
-                    ) {
-                        Text(
-                            text = "Generate",
-                            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                        )
+                when(mainScreenState) {
+                    MainScreenState.Initial -> {
+                        Button(
+                            onClick = {
+                                mainScreenViewModel.onGenerateButtonClick()
+                            },
+                            modifier = Modifier.size(128.dp),
+                        ) {
+                            Text(
+                                text = "Generate",
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                            )
+                        }
                     }
-                    if(rngOutput != null)
+                    MainScreenState.Generated -> {
+                        Button(
+                            onClick = {
+                                mainScreenViewModel.onGenerateButtonClick()
+                            },
+                            modifier = Modifier.size(128.dp),
+                        ) {
+                            Text(
+                                text = "Generate",
+                                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                            )
+                        }
                         Text("RNG Value: $rngOutput")
-                } // else
+                    }
+                    MainScreenState.WarmingUp -> {
+                        CircularProgressIndicator()
+                        Text("Warming up...")
+                    }
+                    MainScreenState.Processing -> {
+                        CircularProgressIndicator()
+                        Text("Processing...")
+                    }
+                    MainScreenState.Generating -> {
+                        LinearProgressIndicator()
+                        Text("Generating your best number...")
+                    }
+                } // when
 
             } // End Column
 
-            MinMaxTextFields(
-                minOutput = minOutput,
-                maxOutput = maxOutput,
-                setMinOutput = { it ->
-                    mainScreenViewModel.minOutput.value = it
-                },
-                setMaxOutput = { it ->
-                    mainScreenViewModel.maxOutput.value = it
-                },
-            )
+            if(
+                mainScreenState == MainScreenState.Generated ||
+                mainScreenState == MainScreenState.Initial
+            ) {
+                MinMaxTextFields(
+                    minOutput = minOutput,
+                    maxOutput = maxOutput,
+                    setMinOutput = { it ->
+                        mainScreenViewModel.minOutput.value = it
+                    },
+                    setMaxOutput = { it ->
+                        mainScreenViewModel.maxOutput.value = it
+                    },
+                )
+            } // if
 
 
         } // End Column
