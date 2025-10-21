@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -49,6 +50,7 @@ fun MainScreen() {
         ) {
             val mainScreenViewModel : MainScreenViewModel = viewModel()
 
+            val isLoading by mainScreenViewModel.isLoading.collectAsState()
             val rngOutput by mainScreenViewModel.rngOutput.collectAsState()
             val minOutput by mainScreenViewModel.minOutput.collectAsState()
             val maxOutput by mainScreenViewModel.maxOutput.collectAsState()
@@ -60,20 +62,25 @@ fun MainScreen() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Button(
-                    onClick = {
-                        mainScreenViewModel.rngOutput.value = Random.nextInt(minOutput, maxOutput)
-                    },
-                    modifier = Modifier.size(128.dp),
-                ) {
-                    Text(
-                        text = "Generate",
-                        fontSize = MaterialTheme.typography.bodyLarge.fontSize,
-                    )
-                }
 
-                if(rngOutput != null)
-                    Text("RNG Value: $rngOutput")
+                if(isLoading) {
+                    CircularProgressIndicator()
+                    Text("Generating your best number...")
+                } else {
+                    Button(
+                        onClick = {
+                            mainScreenViewModel.onGenerateButtonClick()
+                        },
+                        modifier = Modifier.size(128.dp),
+                    ) {
+                        Text(
+                            text = "Generate",
+                            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                        )
+                    }
+                    if(rngOutput != null)
+                        Text("RNG Value: $rngOutput")
+                } // else
 
             } // End Column
 
