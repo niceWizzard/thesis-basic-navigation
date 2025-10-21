@@ -1,16 +1,14 @@
 package com.lakadgroup.test
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainScreenViewModel : ViewModel() {
 
 
-    var rngOutput : MutableState<Int?> = mutableStateOf(null)
+    var rngOutput = MutableStateFlow<Int?>(null)
 
-    var minOutput : MutableState<Int> = mutableIntStateOf(0)
-    var maxOutput : MutableState<Int> = mutableIntStateOf(1000)
+    var minOutput = MutableStateFlow(0)
+    var maxOutput = MutableStateFlow(1000)
 
 }
