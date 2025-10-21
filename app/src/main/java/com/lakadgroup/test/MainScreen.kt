@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,10 +50,12 @@ fun MainScreen() {
             verticalArrangement = Arrangement.Bottom,
 
         ) {
-            var rngOutput : Int? by remember { mutableStateOf(null) }
+            val mainScreenViewModel : MainScreenViewModel = viewModel()
 
-            var minOutput : Int by remember { mutableIntStateOf(0) }
-            var maxOutput : Int by remember { mutableIntStateOf(1000) }
+
+            val rngOutput : Int? by remember { mainScreenViewModel.rngOutput }
+            val minOutput : Int by remember { mainScreenViewModel.minOutput }
+            val maxOutput : Int by remember { mainScreenViewModel.maxOutput }
 
             Column(
                 modifier = Modifier
@@ -63,7 +66,7 @@ fun MainScreen() {
             ) {
                 Button(
                     onClick = {
-                        rngOutput = Random.nextInt(minOutput, maxOutput)
+                        mainScreenViewModel.rngOutput.value = Random.nextInt(minOutput, maxOutput)
                     },
                     modifier = Modifier.size(128.dp),
                 ) {
@@ -82,10 +85,10 @@ fun MainScreen() {
                 minOutput = minOutput,
                 maxOutput = maxOutput,
                 setMinOutput = { it ->
-                    minOutput = it
+                    mainScreenViewModel.minOutput.value = it
                 },
                 setMaxOutput = { it ->
-                    maxOutput = it
+                    mainScreenViewModel.maxOutput.value = it
                 },
             )
 
